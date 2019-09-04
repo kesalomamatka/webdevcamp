@@ -2,19 +2,22 @@ var express = require("express");
 var app = express();
 var port = 3000;
 var bodyParser = require("body-parser");
+var Campground = require("./models/campground");
+var seedDB = require("./seeds");
+
+seedDB();
+
+//var Comment = require("./models/comment");
+//var User = require("./models/user");
+
 
 var mongoose = require("mongoose");
 mongoose.connect("mongodb://127.0.0.1:27017/yelp_camp", {useNewUrlParser: true});
 
 //schema setup
 //db.collection.drop()
-var campgroundSchema = new mongoose.Schema({
-    name: String,
-    image: String,
-    description: String
-});
 
-var Campground = mongoose.model("Campground", campgroundSchema);
+//var Campground = mongoose.model("Campground", campgroundSchema);
 //
 // Campground.create({
 //     name: "Granite Hill",
