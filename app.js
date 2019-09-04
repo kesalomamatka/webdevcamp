@@ -3,8 +3,23 @@ var app = express();
 var port = 3000;
 var bodyParser = require("body-parser");
 var Campground = require("./models/campground");
-var seedDB = require("./seeds")
+var seedDB = require("./seeds");
+var passport = require("passport");
+var LocalStrategy = require("passport-local");
+var User = require("./models/user")
 
+app.use(require("express-session")({
+    secret:"top secret here",
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+//User.authenticate() from user.js passportLocalMongoose
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 
 var Comment = require("./models/comment");
@@ -106,6 +121,31 @@ app.post("/campgrounds/:id/comments",function(req,res){
     })
 })
 
+//===========
+//AUTH ROUTES
+//===========
+
+
+app.get("/register",function (req,res){
+    res.render("register");
+})
+//local mongoose
+
+app.post("/register",function (req,res){
+    var newUser = new User({username: req.body.username});
+    //store hash
+    User.register(newUser, req.body.password, function(err, user){
+        if(err){
+            console.log(err);
+            res.redirect("/register");
+        }else{
+            passport.authenticate("local")(req,res,function(){
+                res.redirect("/campgrounds");
+
+            })
+        }
+    })
+})
 
 app.listen(port, function () {
     console.log("started:" + port);
